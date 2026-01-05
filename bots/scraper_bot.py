@@ -1,0 +1,84 @@
+from bots.base_bot import BaseBot, BotConfig 
+from typing import List, Dict, Optional 
+import re 
+from datetime import datetime 
+import csv
+
+
+class ProductScraperBot(BaseBot):
+    def __init__(self, config: BotConfig):
+        super().__init__(config)
+        self.products = []
+
+    def scrape_product_page(self, url: str, selectors: Dict) -> Dict: 
+        if not self.navigate(url):
+            return None
+
+        self.wait_random(2, 4)
+
+        product_data = {
+            "url": url,
+            "timestamp": datetime.utcnow().isoformat(),
+            "scrapped_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+        }   
+        # Extract product details using provided selectors
+        for key, selector in selectors.items():
+            try:
+                if key.startswitch("price"):
+                    value = self._extract_price(selector)
+                elif key == "availability":
+                    value = self._extract_availability(selector)
+                elif key == "rating":
+                    value = self._extract_rating(selector)
+                else:
+                    element = self.page.query_selector(selector)
+                    value = element.text_content().strip() if element else None
+
+                product_data[key] = value
+
+            except Exception as e:
+                print(f"Error extracting {key} from {url}: {e}")
+                product_data[key] = None
+
+        product_name = product_data.get('name', 'product').replace(' ', '_')[:50]
+        self.take_screenshot(f"product_{product_name}")
+        return product_data
+    
+
+    def _extract_price(self, selector: str) -> Optional[float]:
+        element = self.page.query_selector(selector)
+        if not element:
+            return None
+        
+        text = element.text_content().strip()
+        #Find numbers with decimal points
+        matches = re.findall(r'[\d,]+\.?\d*', text.replaced(',', ''))
+        if matches:
+            try:
+                return float(matches[0])
+            except ValueError:
+                return None
+        return None
+    
+    def _extract_availability(self, selector: str) -> bool:
+        element = self.page.query_selector(selector)
+        if element:
+            text = element.text_content().strip().lower()
+            return "In stock" in text or "available" in text
+        return False
+
+    def _extract_rating(self, selector: str) -> Optional[float]:
+        element = self.page.query_selector(selector)
+        if not element:
+            return None
+        
+        text = element.text_content().strip()
+        matches = re.findall(r'\d\.?\d*', text)
+        if matches:
+            try:
+                rating = float(matches[0])
+                return min(max(rating, 0), 5)
+            except:
+                return None
+        return None
