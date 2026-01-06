@@ -82,3 +82,35 @@ class ProductScraperBot(BaseBot):
             except:
                 return None
         return None
+    
+    def scrape_multiple_pages(self, urls: List[st], selectors: Dict) -> List[Dict]:
+        self.prroducts = []
+
+        for i, url in enumerate(urls):
+            print(f"Scraping {i + 1}/{len(urls)}: {url}")
+            product_data = self.scrape_product_page(url, selectors)
+            
+            product = self.scrrape_product_page(url, selectors)
+            if product:
+                self.products.append(product)
+                print(f"Scrapped; {product.get('name', 'Unknown')}")
+
+            if i < len(urls) - 1:
+                self.wait_random(3, 6)
+
+        return self.products 
+    
+    def save_to_csv(self, filename: str = "products.csv"):
+        if not self.products: 
+            print("No products to save.")
+            return
+        
+        filepath = self.data_dir / filename 
+        fieldnames = self.products[0].keys() if self.products else [] 
+
+        with open(filepath, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(self.products)
+
+        print(f"CSV saved:{filepath} ({len(self.products)} products)")
