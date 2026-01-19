@@ -25,7 +25,7 @@ class ProductScraperBot(BaseBot):
         # Extract product details using provided selectors
         for key, selector in selectors.items():
             try:
-                if key.startswitch("price"):
+                if key.startswith("price"):
                     value = self._extract_price(selector)
                 elif key == "availability":
                     value = self._extract_availability(selector)
@@ -53,7 +53,7 @@ class ProductScraperBot(BaseBot):
         
         text = element.text_content().strip()
         #Find numbers with decimal points
-        matches = re.findall(r'[\d,]+\.?\d*', text.replaced(',', ''))
+        matches = re.findall(r'[\d,]+\.?\d*', text.replace(',', ''))
         if matches:
             try:
                 return float(matches[0])
@@ -83,17 +83,16 @@ class ProductScraperBot(BaseBot):
                 return None
         return None
     
-    def scrape_multiple_pages(self, urls: List[st], selectors: Dict) -> List[Dict]:
-        self.prroducts = []
+    def scrape_multiple_pages(self, urls: List[str], selectors: Dict) -> List[Dict]:
+        self.products = []
 
         for i, url in enumerate(urls):
             print(f"Scraping {i + 1}/{len(urls)}: {url}")
-            product_data = self.scrape_product_page(url, selectors)
             
-            product = self.scrrape_product_page(url, selectors)
+            product = self.scrape_product_page(url, selectors)
             if product:
                 self.products.append(product)
-                print(f"Scrapped; {product.get('name', 'Unknown')}")
+                print(f"Scraped: {product.get('name', 'Unknown')}")
 
             if i < len(urls) - 1:
                 self.wait_random(3, 6)

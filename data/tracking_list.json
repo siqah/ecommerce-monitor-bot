@@ -1,0 +1,24 @@
+[
+    {
+        "name": "Wireless Earbuds",
+        "url": "https://www.amazon.com/dp/B08N5WRWNW",
+        "selectors": {
+            "name": "#productTitle",
+            "price": ".a-price-whole",
+            "availability": "#availability span"
+        },
+        "target_price": 100.0,
+        "alert_email": "your-email@example.com"
+    },
+    {
+        "name": "Gaming Mouse",
+        "url": "https://www.amazon.com/dp/B07S5QWM6L",
+        "selectors": {
+            "name": "#productTitle",
+            "price": ".a-price-whole",
+            "availability": "#availability span"
+        },
+        "target_price": 50.0,
+        "alert_email": "your-email@example.com"
+    }
+]

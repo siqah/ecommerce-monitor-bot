@@ -1,4 +1,4 @@
-from bots.scraper_bot import PrroductScraperBot
+from bots.scraper_bot import ProductScraperBot
 import json
 from datetime import date, datetime, time, timedelta 
 from typing import List, Dict 
@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class PriceMonitorBot(PrroductScraperBot):
+class PriceMonitorBot(ProductScraperBot):
     def __init__(self, config=None):
         super().__init__(config)
         self.price_history = {}

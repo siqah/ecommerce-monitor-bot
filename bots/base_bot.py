@@ -37,9 +37,13 @@ class BaseBot:
 
     def start(self):
         self.playwright = sync_playwright().start()
-        self.browser = self.playwrright.chromium.launch(
+        self.browser = self.playwright.chromium.launch(
             headless=self.config.headless,
             slow_mo=self.config.slow_mo
+        )
+        self.context = self.browser.new_context(
+            user_agent=self.config.user_agent,
+            viewport=self.config.viewport
         )
         self.page = self.context.new_page()
         self.page.set_default_timeout(self.config.timeout)
